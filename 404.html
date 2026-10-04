@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 · Page Not Found | LX Point</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="theme-color" content="#ff4d00">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #fff;
+    color: #222;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+button { cursor: pointer; font-family: inherit; }
+input  { font-family: inherit; }
+a      { text-decoration: none; color: inherit; }
+img    { display: block; max-width: 100%; }
+
+/* =========================================================
+   HEADER
+========================================================= */
+.header {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-main {
+    height: 74px;
+    max-width: 1440px;
+    margin: auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+.logo {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    white-space: nowrap;
+    color: #222;
+}
+.logo span { color: #ff4747; }
+
+.search-area {
+    flex: 1;
+    display: flex;
+
+}
+.search-area input {
+    width: 100%;
+    height: 44px;
+    border: 1.5px solid #000;
+    border-right: none;
+    padding: 0 16px;
+    outline: none;
+    font-size: 14px;
+    border-radius: 50px 0 0 50px;
+}
+.search-btn {
+    width: 54px;
+    border: none;
+    background: #000;
+    color: #fff;
+    border-radius: 0 50px 50px 0;
+    font-size: 18px;
+}
+
+/* =========================================================
+   404 CONTENT
+========================================================= */
+.page {
+    min-height: calc(100vh - 74px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px 70px;
+    background:
+        radial-gradient(1200px 500px at 50% -10%, #fff3e8 0%, #fff 55%),
+        #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative floating blobs */
+.page::before,
+.page::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    pointer-events: none;
+}
+.page::before {
+    width: 320px;
+    height: 320px;
+    background: linear-gradient(135deg, #ff8a00, #ff4747);
+    top: -80px;
+    left: -80px;
+}
+.page::after {
+    width: 260px;
+    height: 260px;
+    background: linear-gradient(135deg, #ffb347, #ff6a00);
+    bottom: -60px;
+    right: -60px;
+}
+
+.card {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 620px;
+    width: 100%;
+    animation: rise 0.6s ease both;
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Big 404 */
+.big404 {
+    font-size: clamp(96px, 22vw, 180px);
+    line-height: 0.9;
+    font-weight: 800;
+    letter-spacing: -6px;
+    background: linear-gradient(135deg, #ff8a00 0%, #ff4747 60%, #ff2d55 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+    position: relative;
+    display: inline-block;
+    filter: drop-shadow(0 8px 20px rgba(255,71,71,.15));
+}
+
+/* Small floating emoji over the 404 */
+.big404::after {
+    content: "🛍️";
+    position: absolute;
+    top: 12%;
+    right: -6px;
+    font-size: 42px;
+    -webkit-text-fill-color: initial;
+    transform: rotate(-12deg);
+    animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-12deg); }
+    50%      { transform: translateY(-8px) rotate(-6deg); }
+}
+
+.title {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: #1a1a2e;
+    letter-spacing: -0.3px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.7;
+    margin: 0 auto 30px;
+    max-width: 440px;
+}
+
+/* Buttons */
+.actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 34px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 48px;
+    padding: 0 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    border: none;
+    transition: transform .15s, box-shadow .15s;
+}
+.btn:active { transform: scale(.97); }
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff8a00, #ff4747);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(255,71,71,.32);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(255,71,71,.4);
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #222;
+    border: 1.5px solid #e5e5e5;
+}
+.btn-secondary:hover {
+    border-color: #ff6a00;
+    color: #ff6a00;
+    transform: translateY(-2px);
+}
+
+/* Quick links */
+.quick-links {
+    padding-top: 26px;
+    border-top: 1px dashed #e8e8e8;
+}
+.quick-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    margin-bottom: 14px;
+}
+.quick-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+.quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: #f7f7f7;
+    color: #333;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .15s;
+    border: 1px solid transparent;
+}
+.quick-chip:hover {
+    background: #fff3e8;
+    color: #ff6a00;
+    border-color: #ffd9b3;
+    transform: translateY(-1px);
+}
+.quick-chip i {
+    font-size: 13px;
+    color: #ff6a00;
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+    .logo { display: none; }
+    .header {
+        background: linear-gradient(90deg, #ff4d00);
+        border-bottom: none;
+    }
+    .header-main {
+        background: linear-gradient(90deg, #ff4d00);
+        height: 62px;
+        padding: 0 12px;
+        gap: 8px;
+    }
+    .search-area {
+        margin-left: 0;
+        max-width: none;
+        flex: 1;
+    }
+    .search-area input {
+        height: 38px;
+        border: none;
+        font-size: 14px;
+    }
+    .search-btn {
+        width: 46px;
+        background: #000;
+        font-size: 16px;
+    }
+    .page {
+        min-height: calc(100vh - 62px);
+        padding: 40px 18px 60px;
+    }
+    .title { font-size: 22px; }
+    .subtitle { font-size: 13px; }
+    .btn { height: 44px; padding: 0 20px; font-size: 13px; }
+    .actions { gap: 10px; }
+    .btn { flex: 1 1 auto; justify-content: center; }
+    .big404::after { font-size: 32px; right: -2px; }
+}
+
+@media (max-width: 380px) {
+    .quick-chip { font-size: 12px; padding: 8px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- =====================================================
+     HEADER
+====================================================== -->
+<header class="header">
+    <div class="header-main">
+        <a href="/" class="logo">LX<span>Point</span></a>
+
+        <div class="search-area">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <button class="search-btn" id="searchButton" aria-label="Search">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- =====================================================
+     404 CONTENT
+====================================================== -->
+<main class="page">
+    <div class="card">
+
+        <h1 class="big404">404</h1>
+        <h2 class="title">Oops! Page not found</h2>
+        <p class="subtitle">
+            The page you're looking for may have been moved, removed,
+            or never existed. Let's get you back on track.
+        </p>
+
+        <div class="actions">
+            <a href="/" class="btn btn-primary">
+                <i class="fas fa-home"></i>
+                Go to Homepage
+            </a>
+            <button onclick="history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Go Back
+            </button>
+        </div>
+
+        <div class="quick-links">
+            <div class="quick-label">Popular Categories</div>
+            <div class="quick-grid">
+                <a href="/" class="quick-chip">
+                    <i class="fas fa-th-large"></i> All Products
+                </a>
+                <a href="/?search=phone" class="quick-chip">
+                    <i class="fas fa-mobile-alt"></i> Phones
+                </a>
+                <a href="/?search=watch" class="quick-chip">
+                    <i class="fas fa-clock"></i> Watches
+                </a>
+                <a href="/?search=gadget" class="quick-chip">
+                    <i class="fas fa-headphones"></i> Gadgets
+                </a>
+                <a href="/?search=home" class="quick-chip">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script>
+    // Search on 404 → go to homepage with keyword
+    const searchBtn = document.getElementById('searchButton');
+    const searchInput = document.getElementById('searchInput');
+
+    function doSearch() {
+        const value = (searchInput.value || '').trim();
+        if (value) {
+            window.location.href = `/?search=${encodeURIComponent(value)}`;
+        } else {
+            window.location.href = '/';
+        }
+    }
+
+    searchBtn?.addEventListener('click', doSearch);
+    searchInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') doSearch();
+    });
+</script>
+
+</body>
+</html>
