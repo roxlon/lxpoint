@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WhatsApp Chat Viewer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background-color: #111b21;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    .whatsapp-container {
+      width: 100%;
+      max-width: 900px;
+      height: 95vh;
+      max-height: 900px;
+      background-color: #0b141a;
+      border-radius: 24px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid #2a3942;
+      position: relative;
+    }
+
+    /* ============ UPLOAD SCREEN ============ */
+    .upload-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 24px;
+      gap: 24px;
+      text-align: center;
+    }
+
+    .upload-screen .logo { font-size: 64px; line-height: 1; }
+
+    .upload-screen h1 {
+      color: #e9edef;
+      font-size: 26px;
+      font-weight: 600;
+    }
+
+    .upload-screen p {
+      color: #8696a0;
+      font-size: 15px;
+      max-width: 400px;
+      line-height: 1.5;
+    }
+
+    .dropzone {
+      width: 100%;
+      max-width: 480px;
+      border: 2px dashed #2a3942;
+      border-radius: 16px;
+      padding: 36px 24px;
+      background-color: #182229;
+      cursor: pointer;
+      transition: border-color 0.2s, background-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: #00a884;
+      background-color: #1f2c33;
+    }
+
+    .dropzone .icon { font-size: 40px; }
+    .dropzone .label { color: #e9edef; font-weight: 500; font-size: 15px; }
+    .dropzone .sub { color: #8696a0; font-size: 13px; }
+
+    .btn {
+      background-color: #00a884;
+      color: #111b21;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 24px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn:hover { background-color: #06cf9c; }
+    .hidden { display: none !important; }
+
+    /* ============ CHAT VIEW ============ */
+    .chat-header {
+      background-color: #1f2c33;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #2a3942;
+      flex-shrink: 0;
+    }
+
+    .back-icon {
+      color: #aebac1;
+      font-size: 22px;
+      cursor: pointer;
+      margin-right: 4px;
+      padding: 4px;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+      user-select: none;
+    }
+    .back-icon:hover { background-color: #2a3942; }
+
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+      color: #e9edef;
+      background: linear-gradient(145deg, #5d6d76, #3e4c54);
+    }
+
+    .contact-info { flex: 1; min-width: 0; }
+
+    .contact-name {
+      color: #e9edef;
+      font-weight: 600;
+      font-size: 17px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .contact-status {
+      color: #8696a0;
+      font-size: 13px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 22px;
+      color: #aebac1;
+      font-size: 20px;
+      cursor: default;
+      flex-shrink: 0;
+    }
+
+    /* ============ TOOLBAR (Search + Date filter) ============ */
+    .toolbar {
+      background-color: #111b21;
+      padding: 8px 14px 10px 14px;
+      border-bottom: 1px solid #2a3942;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .search-box {
+      background-color: #202c33;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      gap: 10px;
+      color: #8696a0;
+    }
+
+    #searchInput {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e9edef;
+      font-size: 15px;
+      width: 100%;
+      padding: 2px 0;
+    }
+    #searchInput::placeholder { color: #8696a0; }
+
+    /* date filter row */
+    .date-filter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .date-filter-row label {
+      color: #8696a0;
+      font-size: 12.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-input {
+      background-color: #202c33;
+      border: 1px solid #2a3942;
+      color: #e9edef;
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 13px;
+      outline: none;
+      font-family: inherit;
+      cursor: pointer;
+      color-scheme: dark;
+    }
+
+    .date-input:focus { border-color: #00a884; }
+
+    .clear-filters {
+      background-color: transparent;
+      border: 1px solid #2a3942;
+      color: #8696a0;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: auto;
+    }
+    .clear-filters:hover {
+      background-color: #2a3942;
+      color: #e9edef;
+    }
+    .clear-filters:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* results info + nav */
+    .search-results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #8696a0;
+      font-size: 12.5px;
+      padding: 2px 4px 0 4px;
+      min-height: 20px;
+    }
+
+    .search-results-bar .count {
+      color: #00a884;
+      font-weight: 600;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      background-color: #202c33;
+      border: 1px solid #2a3942;
+      color: #aebac1;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s;
+      padding: 0;
+      line-height: 1;
+    }
+    .nav-btn:hover:not(:disabled) { background-color: #2a3942; color: #e9edef; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* ============ MESSAGES ============ */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" opacity="0.06"><path d="M20 20 L30 20 L25 30 Z M70 80 L80 80 L75 90 Z M10 60 L18 60 L14 68 Z" fill="%23ffffff" /></svg>');
+      background-size: 60px 60px;
+      background-color: #0b141a;
+      scroll-behavior: smooth;
+      position: relative;
+    }
+
+    .message-row {
+      display: flex;
+      margin-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+
+    .message-row.left { justify-content: flex-start; }
+    .message-row.right { justify-content: flex-end; }
+
+    .bubble {
+      max-width: 78%;
+      padding: 8px 12px 7px 12px;
+      border-radius: 12px;
+      font-size: 14.5px;
+      line-height: 1.35;
+      word-wrap: break-word;
+      position: relative;
+      box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+
+    .bubble.left {
+      background-color: #202c33;
+      color: #e9edef;
+      border-top-left-radius: 4px;
+    }
+    .bubble.right {
+      background-color: #005c4b;
+      color: #e9edef;
+      border-top-right-radius: 4px;
+    }
+
+    /* dimmed state when searching (non-matching messages) */
+    .message-row.dimmed { opacity: 0.35; }
+
+    /* active match highlight (the current target message) */
+    .message-row.active-match .bubble {
+      box-shadow: 0 0 0 2px #f5c542, 0 2px 8px rgba(245,197,66,0.4);
+      transform: scale(1.01);
+    }
+
+    .message-meta {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #8696a0;
+      margin-top: 4px;
+      line-height: 1;
+    }
+
+    .time { font-size: 10.5px; }
+    .ticks { font-size: 12px; color: #53bdeb; letter-spacing: -2px; }
+
+    .system-message {
+      background-color: #182229;
+      color: #8696a0;
+      font-size: 12.5px;
+      padding: 5px 14px;
+      border-radius: 30px;
+      text-align: center;
+      max-width: 90%;
+      margin: 8px auto;
+      border: 1px solid #2a3942;
+      line-height: 1.4;
+      transition: opacity 0.2s;
+    }
+    .system-message.dimmed { opacity: 0.35; }
+
+    .call-message {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14.5px;
+    }
+    .call-icon { font-size: 16px; opacity: 0.8; }
+
+    .highlight {
+      background-color: #f5c542;
+      color: #0b141a;
+      font-weight: 500;
+      border-radius: 3px;
+      padding: 0 2px;
+    }
+
+    .date-separator {
+      text-align: center;
+      font-size: 12px;
+      color: #8696a0;
+      background: #182229;
+      align-self: center;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin: 8px 0 4px 0;
+      transition: opacity 0.2s;
+    }
+    .date-separator.dimmed { opacity: 0.35; }
+
+    .chat-messages::-webkit-scrollbar { width: 6px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: #3a4a53;
+      border-radius: 10px;
+    }
+    .chat-messages::-webkit-scrollbar-thumb:hover { background-color: #5d6f7a; }
+
+    .new-chat-btn {
+      position: absolute;
+      bottom: 18px;
+      right: 18px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: #00a884;
+      color: #111b21;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s, transform 0.15s;
+      z-index: 10;
+    }
+    .new-chat-btn:hover { background-color: #06cf9c; transform: scale(1.05); }
+
+    .empty-state {
+      color: #8696a0;
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      margin: auto;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 0; }
+      .whatsapp-container {
+        border-radius: 0;
+        height: 100vh;
+        max-height: none;
+        border: none;
+      }
+      .upload-screen h1 { font-size: 22px; }
+      .date-filter-row label span { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="whatsapp-container">
+    <!-- ================= UPLOAD SCREEN ================= -->
+    <div class="upload-screen" id="uploadScreen">
+      <div class="logo">💬</div>
+      <h1>WhatsApp Chat Viewer</h1>
+      <p>Upload your exported WhatsApp chat (.txt file) to view it in a WhatsApp-style interface.</p>
+
+      <div class="dropzone" id="dropzone">
+        <div class="icon">📄</div>
+        <div class="label">Drop your chat.txt here</div>
+        <div class="sub">or click to browse</div>
+      </div>
+
+      <button class="btn" id="browseBtn">Choose File</button>
+      <input type="file" id="fileInput" accept=".txt,text/plain" style="display:none;">
+    </div>
+
+    <!-- ================= CHAT VIEW ================= -->
+    <div id="chatView" class="hidden" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+      <div class="chat-header">
+        <div class="back-icon" id="backBtn" title="Load another chat">←</div>
+        <div class="avatar" id="avatarEl">Z</div>
+        <div class="contact-info">
+          <div class="contact-name" id="contactNameEl">Chat</div>
+          <div class="contact-status">
+            <span class="status-dot"></span> <span id="msgCountEl">online</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span>📞</span>
+          <span>⋮</span>
+        </div>
+      </div>
+
+      <!-- toolbar: search + date filter -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="searchInput" placeholder="Search messages...">
+        </div>
+
+        <div class="date-filter-row">
+          <label>
+            <span>From</span>
+            <input type="date" id="dateFrom" class="date-input">
+          </label>
+          <label>
+            <span>To</span>
+            <input type="date" id="dateTo" class="date-input">
+          </label>
+          <button class="clear-filters" id="clearFilters" disabled>Clear</button>
+        </div>
+
+        <div class="search-results-bar">
+          <span id="resultsInfo"></span>
+          <div class="nav-buttons">
+            <button class="nav-btn" id="prevMatch" title="Previous match" disabled>▲</button>
+            <button class="nav-btn" id="nextMatch" title="Next match" disabled>▼</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages"></div>
+
+      <button class="new-chat-btn" id="newChatBtn" title="Load another chat">＋</button>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- DOM ----------
+      const uploadScreen = document.getElementById('uploadScreen');
+      const chatView = document.getElementById('chatView');
+      const dropzone = document.getElementById('dropzone');
+      const browseBtn = document.getElementById('browseBtn');
+      const fileInput = document.getElementById('fileInput');
+      const backBtn = document.getElementById('backBtn');
+      const newChatBtn = document.getElementById('newChatBtn');
+      const chatMessagesEl = document.getElementById('chatMessages');
+      const searchInput = document.getElementById('searchInput');
+      const contactNameEl = document.getElementById('contactNameEl');
+      const avatarEl = document.getElementById('avatarEl');
+      const msgCountEl = document.getElementById('msgCountEl');
+
+      const dateFromEl = document.getElementById('dateFrom');
+      const dateToEl = document.getElementById('dateTo');
+      const clearFiltersBtn = document.getElementById('clearFilters');
+      const resultsInfoEl = document.getElementById('resultsInfo');
+      const prevMatchBtn = document.getElementById('prevMatch');
+      const nextMatchBtn = document.getElementById('nextMatch');
+
+      // ---------- STATE ----------
+      let allMessages = [];
+      let leftSender = null;
+      let matchIndices = [];       // indices in allMessages of matching messages
+      let currentMatch = -1;       // pointer into matchIndices
+      let renderToken = 0;         // to cancel stale render callbacks
+
+      // ---------- PARSE ----------
+      function parseChat(rawText) {
+        const messages = [];
+        const lines = rawText.split(/\r?\n/);
+        const lineRegex = /^\[(\d{4}-\d{2}-\d{2})[,\s]+(\d{1,2}:\d{2}(?::\d{2})?)\]\s*([^:]+):\s*(.*)$/;
+
+        for (const rawLine of lines) {
+          if (!rawLine.trim()) continue;
+          const line = rawLine.replace(/[\u200E\u200F\u202A-\u202E]/g, '');
+          const match = line.match(lineRegex);
+          if (!match) continue;
+          const [, date, time, senderRaw, contentRaw] = match;
+          const sender = senderRaw.trim();
+          let content = contentRaw.trim();
+
+          let type = 'text';
+          if (/^(Voice call|Video call|Missed voice call|Missed video call)/i.test(content)) type = 'call';
+          else if (/^image omitted$/i.test(content) || /^sticker omitted$/i.test(content)) type = 'image';
+          else if (/^video omitted$/i.test(content)) type = 'video';
+          else if (/^audio omitted$/i.test(content)) type = 'audio';
+          else if (/^document omitted$/i.test(content) || /^GIF omitted$/i.test(content)) type = 'file';
+          else if (/Messages and calls are end-to-end encrypted/i.test(content)) type = 'system';
+
+          messages.push({
+            date,
+            time: time.length >= 5 ? time.slice(0, 5) : time,
+            sender, type, content
+          });
+        }
+        return messages;
+      }
+
+      // ---------- HELPERS ----------
+      function formatDate(dateStr) {
+        const [year, month, day] = dateStr.split('-');
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${parseInt(day,10)} ${monthNames[parseInt(month,10)-1]} ${year}`;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function highlightText(text, filter) {
+        if (!filter) return escapeHtml(text);
+        const lowerText = text.toLowerCase();
+        const lowerFilter = filter.toLowerCase();
+        let result = '';
+        let idx = 0, pos;
+        while ((pos = lowerText.indexOf(lowerFilter, idx)) !== -1) {
+          result += escapeHtml(text.slice(idx, pos));
+          result += `<span class="highlight">${escapeHtml(text.slice(pos, pos + filter.length))}</span>`;
+          idx = pos + filter.length;
+        }
+        result += escapeHtml(text.slice(idx));
+        return result;
+      }
+
+      function detectLeftSender(messages) {
+        const firstReal = messages.find(m => m.type !== 'system');
+        return firstReal ? firstReal.sender : null;
+      }
+
+      // ---------- RENDER ----------
+      // Render all messages (dimmed if filter active), then scroll to active match if any.
+      function renderMessages() {
+        const token = ++renderToken;
+        const filterText = searchInput.value.trim();
+        const filterLower = filterText.toLowerCase();
+        const dateFrom = dateFromEl.value; // "YYYY-MM-DD" or ""
+        const dateTo = dateToEl.value;
+
+        chatMessagesEl.innerHTML = '';
+        matchIndices = [];
+        currentMatch = -1;
+
+        if (allMessages.length === 0) {
+          const e = document.createElement('div');
+          e.className = 'empty-state';
+          e.textContent = 'This chat is empty.';
+          chatMessagesEl.appendChild(e);
+          updateSearchBar(0);
+          return;
+        }
+
+        let lastDate = null;
+        let visibleCount = 0;
+
+        allMessages.forEach((msg, i) => {
+          const inDateRange = (!dateFrom || msg.date >= dateFrom) && (!dateTo || msg.date <= dateTo);
+          const matchesText = !filterLower || msg.content.toLowerCase().includes(filterLower);
+          const isMatch = inDateRange && matchesText;
+
+          // Track matches for navigation
+          if (isMatch) matchIndices.push(i);
+
+          // If outside date range, hide entirely
+          if (!inDateRange) return;
+
+          visibleCount++;
+
+          // Date separator (only for visible messages)
+          if (lastDate !== msg.date) {
+            const sep = document.createElement('div');
+            sep.className = 'date-separator';
+            if (filterLower && !isMatch) sep.classList.add('dimmed');
+            sep.textContent = formatDate(msg.date);
+            sep.dataset.index = i; // tie to the message index
+            chatMessagesEl.appendChild(sep);
+            lastDate = msg.date;
+          }
+
+          if (msg.type === 'system') {
+            const sysDiv = document.createElement('div');
+            sysDiv.className = 'system-message';
+            if (filterLower && !isMatch) sysDiv.classList.add('dimmed');
+            sysDiv.innerHTML = filterLower && isMatch
+              ? highlightText(msg.content, filterText)
+              : escapeHtml(msg.content);
+            sysDiv.dataset.index = i;
+            chatMessagesEl.appendChild(sysDiv);
+            return;
+          }
+
+          const isLeft = msg.sender === leftSender;
+          const row = document.createElement('div');
+          row.className = `message-row ${isLeft ? 'left' : 'right'}`;
+          row.dataset.index = i;
+          if (filterLower && !isMatch) row.classList.add('dimmed');
+
+          const bubble = document.createElement('div');
+          bubble.className = `bubble ${isLeft ? 'left' : 'right'}`;
+
+          const contentDiv = document.createElement('div');
+          const inner = filterLower && isMatch
+            ? highlightText(msg.content, filterText)
+            : escapeHtml(msg.content);
+
+          if (msg.type === 'text') {
+            contentDiv.innerHTML = inner;
+          } else if (msg.type === 'call') {
+            const icon = /video/i.test(msg.content) ? '📹' : '📞';
+            contentDiv.innerHTML = `<div class="call-message"><span class="call-icon">${icon}</span> ${inner}</div>`;
+          } else if (msg.type === 'image') {
+            contentDiv.innerHTML = `<div class="call-message"><span class="call-icon">🖼️</span> ${inner}</div>`;
+          } else if (msg.type === 'video') {
+            contentDiv.innerHTML = `<div class="call-message"><span class="call-icon">🎥</span> ${inner}</div>`;
+          } else if (msg.type === 'audio') {
+            contentDiv.innerHTML = `<div class="call-message"><span class="call-icon">🎤</span> ${inner}</div>`;
+          } else if (msg.type === 'file') {
+            contentDiv.innerHTML = `<div class="call-message"><span class="call-icon">📎</span> ${inner}</div>`;
+          } else {
+            contentDiv.innerHTML = inner;
+          }
+          bubble.appendChild(contentDiv);
+
+          const meta = document.createElement('div');
+          meta.className = 'message-meta';
+          const timeSpan = document.createElement('span');
+          timeSpan.className = 'time';
+          timeSpan.textContent = msg.time;
+          const ticksSpan = document.createElement('span');
+          ticksSpan.className = 'ticks';
+          ticksSpan.textContent = '✓✓';
+          meta.appendChild(timeSpan);
+          meta.appendChild(ticksSpan);
+          bubble.appendChild(meta);
+
+          row.appendChild(bubble);
+          chatMessagesEl.appendChild(row);
+        });
+
+        // Update search bar / nav state
+        updateSearchBar(matchIndices.length);
+
+        // Auto-scroll to first match if there's a text filter
+        if (filterLower && matchIndices.length > 0 && token === renderToken) {
+          // wait for layout to settle
+          requestAnimationFrame(() => {
+            if (token !== renderToken) return;
+            goToMatch(0);
+          });
+        } else {
+          // Otherwise scroll to bottom (natural chat behavior)
+          chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        }
+      }
+
+      function updateSearchBar(totalMatches) {
+        if (totalMatches > 0) {
+          resultsInfoEl.innerHTML = `<span class="count">${currentMatch + 1}</span> of <span class="count">${totalMatches}</span> matches`;
+        } else if (searchInput.value.trim() || dateFromEl.value || dateToEl.value) {
+          resultsInfoEl.textContent = 'No matches';
+        } else {
+          resultsInfoEl.textContent = '';
+        }
+        prevMatchBtn.disabled = totalMatches === 0 || currentMatch <= 0;
+        nextMatchBtn.disabled = totalMatches === 0 || currentMatch >= totalMatches - 1;
+        clearFiltersBtn.disabled = !(searchInput.value.trim() || dateFromEl.value || dateToEl.value);
+      }
+
+      // Scroll to a specific match index in the visible list and flash it
+      function goToMatch(matchPos) {
+        if (matchIndices.length === 0) return;
+        // clamp
+        matchPos = Math.max(0, Math.min(matchPos, matchIndices.length - 1));
+        currentMatch = matchPos;
+
+        const msgIndex = matchIndices[matchPos];
+
+        // Remove previous active highlight
+        chatMessagesEl.querySelectorAll('.active-match').forEach(el => el.classList.remove('active-match'));
+
+        // Find element with that data-index
+        const target = chatMessagesEl.querySelector(`[data-index="${msgIndex}"]`);
+        if (target) {
+          target.classList.add('active-match');
+          target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        updateSearchBar(matchIndices.length);
+      }
+
+      // ---------- LOAD CHAT ----------
+      function loadChatFromText(text, fileName) {
+        allMessages = parseChat(text);
+
+        if (allMessages.length === 0) {
+          alert('No messages could be parsed from this file. Make sure it is a WhatsApp exported chat (.txt).');
+          return;
+        }
+
+        leftSender = detectLeftSender(allMessages);
+
+        // Set date filter bounds to full range
+        const dates = allMessages.map(m => m.date).sort();
+        dateFromEl.min = dates[0];
+        dateFromEl.max = dates[dates.length - 1];
+        dateToEl.min = dates[0];
+        dateToEl.max = dates[dates.length - 1];
+        dateFromEl.value = '';
+        dateToEl.value = '';
+
+        // Header
+        const senders = [...new Set(allMessages.filter(m => m.type !== 'system').map(m => m.sender))];
+        let contactName = 'Chat';
+        if (senders.length >= 2) {
+          contactName = senders.find(s => s !== leftSender) || senders[0];
+        } else if (senders.length === 1) {
+          contactName = senders[0];
+        } else if (fileName) {
+          contactName = fileName.replace(/\.txt$/i, '');
+        }
+        contactNameEl.textContent = contactName;
+        avatarEl.textContent = contactName.trim().charAt(0).toUpperCase() || '?';
+
+        const totalReal = allMessages.filter(m => m.type !== 'system').length;
+        msgCountEl.textContent = `${totalReal} messages`;
+
+        uploadScreen.classList.add('hidden');
+        chatView.classList.remove('hidden');
+
+        searchInput.value = '';
+        renderMessages();
+      }
+
+      function showUploadScreen() {
+        chatView.classList.add('hidden');
+        uploadScreen.classList.remove('hidden');
+        allMessages = [];
+        leftSender = null;
+        matchIndices = [];
+        currentMatch = -1;
+        fileInput.value = '';
+      }
+
+      // ---------- FILE HANDLING ----------
+      function handleFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => loadChatFromText(e.target.result, file.name);
+        reader.onerror = () => alert('Failed to read file.');
+        reader.readAsText(file, 'UTF-8');
+      }
+
+      browseBtn.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+      });
+
+      ['dragenter', 'dragover'].forEach(evt =>
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault(); e.stopPropagation();
+          dropzone.classList.add('dragover');
+        })
+      );
+      ['dragleave', 'drop'].forEach(evt =>
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault(); e.stopPropagation();
+          dropzone.classList.remove('dragover');
+        })
+      );
+      dropzone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+      });
+      window.addEventListener('dragover', (e) => e.preventDefault());
+      window.addEventListener('drop', (e) => e.preventDefault());
+
+      backBtn.addEventListener('click', showUploadScreen);
+      newChatBtn.addEventListener('click', showUploadScreen);
+
+      // ---------- SEARCH + FILTER EVENTS ----------
+      let timeoutId = null;
+      searchInput.addEventListener('input', () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(renderMessages, 180);
+      });
+      searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          if (timeoutId) clearTimeout(timeoutId);
+          renderMessages();
+        }
+      });
+
+      dateFromEl.addEventListener('change', renderMessages);
+      dateToEl.addEventListener('change', renderMessages);
+
+      clearFiltersBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        dateFromEl.value = '';
+        dateToEl.value = '';
+        renderMessages();
+      });
+
+      // Navigation
+      prevMatchBtn.addEventListener('click', () => {
+        if (matchIndices.length === 0) return;
+        const next = currentMatch - 1;
+        if (next < 0) return;
+        goToMatch(next);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (matchIndices.length === 0) return;
+        const next = currentMatch + 1;
+        if (next >= matchIndices.length) return;
+        goToMatch(next);
+      });
+
+      // Keyboard Enter to jump to next match while focused in search
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && matchIndices.length > 0) {
+          e.preventDefault();
+          if (e.shiftKey) {
+            if (currentMatch > 0) goToMatch(currentMatch - 1);
+          } else {
+            if (currentMatch < matchIndices.length - 1) goToMatch(currentMatch + 1);
+            else goToMatch(0); // wrap around
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
