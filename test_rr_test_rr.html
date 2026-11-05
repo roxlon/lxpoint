@@ -300,11 +300,30 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" opacity="0.06"><path d="M20 20 L30 20 L25 30 Z M70 80 L80 80 L75 90 Z M10 60 L18 60 L14 68 Z" fill="%23ffffff" /></svg>');
-      background-size: 60px 60px;
-      background-color: #0b141a;
+      /* --- NEW WALLPAPER (from provided pinimg URL) --- */
+      background-image: url('https://i.pinimg.com/736x/1c/ec/e4/1cece43006d542fca782296a19fbaa47.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-color: #0b141a; /* fallback if image fails */
       scroll-behavior: smooth;
       position: relative;
+    }
+
+    /* Dark overlay to ensure text readability (optional but helpful) */
+    .chat-messages::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.25); /* subtle dark overlay */
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* all direct children need z-index to sit above overlay */
+    .chat-messages > * {
+      position: relative;
+      z-index: 1;
     }
 
     .message-row {
